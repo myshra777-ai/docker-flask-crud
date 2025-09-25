@@ -48,3 +48,8 @@ jobs:
           docker run -d --name flask-app \
             -e DATABASE_URL=postgresql://user:password@localhost:5432/cruddb \
             -p 5000:5000 flask-crud-app
+
+      - name: Test Flask app
+        run: |
+          sleep 5
+          curl --fail http://localhost:5000/ || exit 1
