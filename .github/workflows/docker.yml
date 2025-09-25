@@ -52,6 +52,6 @@ jobs:
       run: |
         docker run -d --name flask-app \
           --link postgres:postgres \
-          -e DATABASE_URL=postgresql://user:password@postgres:5432/cruddb \
+          -e DATABASE_URL=postgresql://user:password@localhost:5432/cruddb \
           -p 5000:5000 flask-crud-app
 
