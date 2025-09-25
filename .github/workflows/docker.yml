@@ -7,19 +7,6 @@ on:
     branches: [ "main" ]
 
 jobs:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
-    - name: Build Docker image
-      run: docker build -t flask-crud-app .
-
-\jobs:
   build:
     runs-on: ubuntu-latest
 
@@ -39,19 +26,25 @@ jobs:
           --health-retries=5
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-    - name: Build Docker image
-      run: docker build -t flask-crud-app .
+      - name: Build Docker image
+        run: docker build -t flask-crud-app .
 
-    - name: Run Flask container
-      run: |
-        docker run -d --name flask-app \
-          --link postgres:postgres \
-          -e DATABASE_URL=postgresql://user:password@localhost:5432/cruddb \
-          -p 5000:5000 flask-crud-app
+      - name: Wait for Postgres
+        run: |
+          for i in {1..10}; do
+            pg_isready -h localhost -p 5432 -U user && break
+            echo "Postgres not ready yet..."
+            sleep 5
+          done
 
+      - name: Run Flask container
+        run: |
+          docker run -d --name flask-app \
+            -e DATABASE_URL=postgresql://user:password@localhost:5432/cruddb \
+            -p 5000:5000 flask-crud-app
